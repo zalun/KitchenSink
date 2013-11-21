@@ -24,7 +24,7 @@
     },
     "geolocation": {
       "description": "Testing"
-	},
+    },
     "contacts": {
       "access": "readwrite",
       "description": "Testing"
