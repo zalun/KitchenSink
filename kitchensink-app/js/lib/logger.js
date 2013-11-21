@@ -10,6 +10,7 @@ define(function(require) {
       Type: type.toUpperCase(),
       message: message
     })).insert(element);
+    console[type](message);
   };
 
   var methods = {
