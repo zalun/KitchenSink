@@ -44,6 +44,38 @@ define(function(require) {
     },
     tests: [
       function(callback) {
+        // https://wiki.mozilla.org/WebAPI/ContactsAPI#Get_all_contacts_example
+        var test = 'getAll';
+        // adding one contact
+        var contact = new mozContact();
+        contact.init({name: 'Tom', note: 'kitchensink'}); // Bug 723206
+        var saving = navigator.mozContacts.save(contact);
+        saving.onsuccess = function() {
+            var cursor = navigator.mozContacts.getAll({});
+
+            cursor.onsuccess = function() {
+                if (!cursor.result) {
+                    callback(false, test, 'No contact found');
+                }
+                var remove = navigator.mozContacts.remove(contact);
+                remove.onsuccess = function() {
+                    callback(true, test);
+                };
+                remove.onerror = function() {
+                    callback(false, test, 'Unable to remove the test contact');
+                };
+            };
+
+            cursor.onerror = function() {
+                callback(false, test, 'Error getting contacts');
+            };
+        };
+        saving.onerror = function() {
+            callback(false, test, 'Error in creating test contact');
+        }
+
+      },
+      function(callback) {
         // https://developer.mozilla.org/en-US/docs/Web/API/ContactManager.find
         var test = 'find example from documentation';
 

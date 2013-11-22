@@ -186,14 +186,16 @@ define(function(require) {
           })
         ).insert(self.apiElement);
         self.apiElement.addClass((result ? 'success' : 'fail')); 
-        if (!result) {
-          var response = self.name + '.';
-          if (testName) {
-            response += testName;
-            if (message) {
-              response += ': ' + message;
-            }
+        var response = self.name + '.';
+        if (testName) {
+          response += testName;
+          if (message) {
+            response += ': ' + message;
           }
+        }
+        if (result) {
+          log.info(response);
+        } else {
           log.error(response, self.contentElement);
         }
         // record the fact that test had run

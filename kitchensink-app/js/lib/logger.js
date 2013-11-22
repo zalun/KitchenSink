@@ -5,12 +5,14 @@ define(function(require) {
   var elements = require('utils').elements;
 
   var send = function(type, message, element) {
-    elements('<p class="{type}">{Type}: {message}</p>'.format({
-      type: type,
-      Type: type.toUpperCase(),
-      message: message
-    })).insert(element);
-    console[type](message);
+    if (element) {
+      elements('<p class="{type}">{Type}: {message}</p>'.format({
+        type: type,
+        Type: type.toUpperCase(),
+        message: message
+      })).insert(element);
+    }
+    console[type](type.toUpperCase() + ': ' + message);
   };
 
   var methods = {
