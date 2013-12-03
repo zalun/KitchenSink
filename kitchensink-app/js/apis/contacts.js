@@ -22,8 +22,8 @@ define(function(require) {
       }
 
       var search = navigator.mozContacts.find({
-          filterBy: 'name',
-          filterValue: 'Tom',
+          filterBy: 'givenName',
+          filterValue: 'kitchensink-app',
           filterOp: 'equals'});
       var count = 0;
       var length;
@@ -47,8 +47,10 @@ define(function(require) {
         // https://wiki.mozilla.org/WebAPI/ContactsAPI#Get_all_contacts_example
         var test = 'getAll';
         // adding one contact
-        var contact = new mozContact();
-        contact.init({name: 'Tom', note: 'kitchensink'}); // Bug 723206
+        var contact = new mozContact({
+          firstName: ['Tom'], 
+          givenName: ['kitchensink-app']
+        }); // Bug 723206
         var saving = navigator.mozContacts.save(contact);
         saving.onsuccess = function() {
             var cursor = navigator.mozContacts.getAll({});
@@ -75,11 +77,13 @@ define(function(require) {
         }
 
       },
+
       function(callback) {
         // https://developer.mozilla.org/en-US/docs/Web/API/ContactManager.find
         var test = 'find example from documentation';
 
         var filter = {
+          // removed `name` as for https://bugzilla.mozilla.org/show_bug.cgi?id=898337
           filterBy: ['name', 'nickname', 'firstName'],
           filterValue: 'zorro',
           filterOp: 'equals',
@@ -96,20 +100,25 @@ define(function(require) {
           callback(false, test, 'Something goes wrong!');
         }
       },
+
       function(callback) {
         var test = 'create and remove a contact';
 
         this.cleanUp(function() {
-          var contact = new mozContact();
-          contact.init({name: 'Tom', note: 'kitchensink'}); // Bug 723206
+          var contact = new mozContact({
+            firstName: ['Tom'], 
+            givenName: ['kitchensink-app']
+          });
           var saving1 = navigator.mozContacts.save(contact);
           saving1.onsuccess = function() {
-            var contact = new mozContact();
-            contact.init({name: 'Jerry', note: 'kitchensink'});
+            var contact = new mozContact({
+              firstName: ['Jerry'], 
+              givenName: ['kitchensink-app']
+            });
             var saving2 = navigator.mozContacts.save(contact);
             saving2.onsuccess = function() {
               var search = navigator.mozContacts.find({
-                filterBy: ['name'],
+                filterBy: ['firstName'],
                 filterValue: 'Tom',
                 filterOp: 'startsWith'});
               search.onsuccess = function() {

@@ -213,7 +213,12 @@ define(function(require) {
       if (this.prepared && this.tests) {
         testCount = this.tests.length;
         this.tests.forEach(function(test) {
-          test.bind(self)(showResult);
+          try {
+            test.bind(self)(showResult);
+          } catch(e) {
+            log.error('Test throws: ' + e, e);
+            throw(e);
+          }
         });
       } else {
         window.clearTimeout(callTimeout);
