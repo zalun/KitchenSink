@@ -22,7 +22,7 @@ define(function(require) {
       }
 
       var search = navigator.mozContacts.find({
-          filterBy: 'givenName',
+          filterBy: ['familyName'],
           filterValue: 'kitchensink-app',
           filterOp: 'equals'});
       var count = 0;
@@ -30,7 +30,6 @@ define(function(require) {
 
       search.onsuccess = function() {
         var contacts = search.result;
-        console.log('deleting ' + contacts.length + ' contacts');
         length = contacts.length;
         if (length === 0) {
           return successCB();
@@ -49,8 +48,8 @@ define(function(require) {
         var test = 'getAll';
         // adding one contact
         var contact = new mozContact({
-          firstName: ['Tom'], 
-          givenName: ['kitchensink-app']
+          givenName: ['Tom'], 
+          familyName: ['kitchensink-app']
         }); // Bug 723206
         var saving = navigator.mozContacts.save(contact);
         saving.onsuccess = function() {
@@ -80,59 +79,37 @@ define(function(require) {
       },
 
       function(callback) {
-        // https://developer.mozilla.org/en-US/docs/Web/API/ContactManager.find
-        var test = 'find example from documentation';
-
-        var filter = {
-          // removed `name` as for https://bugzilla.mozilla.org/show_bug.cgi?id=898337
-          filterBy: ['nickname', 'firstName'],
-          filterValue: 'zorro',
-          filterOp: 'equals',
-          filterLimit: 100
-        };
-
-        var request = window.navigator.mozContacts.find(filter);
-
-        request.onsuccess = function () {
-          callback(true, test);
-        }
-
-        request.onerror = function () {
-          callback(false, test, 'Something goes wrong!');
-        }
-      },
-
-      function(callback) {
-        var test = 'create and remove a contact';
+        var test = 'create, search and remove a contact';
 
         this.cleanUp(function() {
           var contact = new mozContact({
-            firstName: ['Tom'], 
-            givenName: ['kitchensink-app']
+            givenName: ['Tom'], 
+            familyName: ['kitchensink-app']
           });
           var saving1 = navigator.mozContacts.save(contact);
           saving1.onsuccess = function() {
             var contact = new mozContact({
-              firstName: ['Jerry'], 
-              givenName: ['kitchensink-app']
+              givenName: ['Jerry'], 
+              familyName: ['kitchensink-app']
             });
             var saving2 = navigator.mozContacts.save(contact);
             saving2.onsuccess = function() {
               var search = navigator.mozContacts.find({
-                filterBy: ['firstName'],
+                filterBy: ['givenName'],
                 filterValue: 'Tom',
-                filterOp: 'startsWith'});
+                filterOp: 'equals'});
               search.onsuccess = function() {
                 if (search.result.length != 1) {
                   callback(false, test, 'find test failed. Expected: 1, Found: ' + search.result.length);
+                } else {
+                  var removeRequest = navigator.mozContacts.remove(contact);
+                  removeRequest.onsuccess = function() {
+                    callback(true, test);
+                  };
+                  removeRequest.onerror = function() {
+                    callback(false, test, 'remove contact failed');
+                  };
                 }
-                var removeRequest = navigator.mozContacts.remove(contact);
-                removeRequest.onsuccess = function() {
-                  callback(true, test);
-                };
-                removeRequest.onerror = function() {
-                  callback(false, test, 'remove contact failed');
-                };
               };
               search.onerror = function(e) {
                 callback(false, test, 'find error ');
