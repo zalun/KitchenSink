@@ -30,6 +30,7 @@ define(function(require) {
 
       search.onsuccess = function() {
         var contacts = search.result;
+        console.log('deleting ' + contacts.length + ' contacts');
         length = contacts.length;
         if (length === 0) {
           return successCB();
@@ -84,7 +85,7 @@ define(function(require) {
 
         var filter = {
           // removed `name` as for https://bugzilla.mozilla.org/show_bug.cgi?id=898337
-          filterBy: ['name', 'nickname', 'firstName'],
+          filterBy: ['nickname', 'firstName'],
           filterValue: 'zorro',
           filterOp: 'equals',
           filterLimit: 100
