@@ -50,7 +50,7 @@ define(function(require) {
         var contact = new mozContact({
           givenName: ['Tom'], 
           familyName: ['kitchensink-app']
-        }); // Bug 723206
+        }); 
         var saving = navigator.mozContacts.save(contact);
         saving.onsuccess = function() {
             var cursor = navigator.mozContacts.getAll({});
@@ -89,20 +89,20 @@ define(function(require) {
           var saving1 = navigator.mozContacts.save(contact);
           saving1.onsuccess = function() {
             var contact = new mozContact({
-              givenName: ['Jerry'], 
+              givenName: ['Jerry', 'kitchensink-app'], 
               familyName: ['kitchensink-app']
             });
             var saving2 = navigator.mozContacts.save(contact);
             saving2.onsuccess = function() {
               var search = navigator.mozContacts.find({
                 filterBy: ['givenName'],
-                filterValue: 'Tom',
-                filterOp: 'equals'});
+                filterValue: 'kitchensink',
+                filterOp: 'startsWith'});
               search.onsuccess = function() {
                 if (search.result.length != 1) {
                   callback(false, test, 'find test failed. Expected: 1, Found: ' + search.result.length);
                 } else {
-                  var removeRequest = navigator.mozContacts.remove(contact);
+                  var removeRequest = navigator.mozContacts.remove(search.result[0]);
                   removeRequest.onsuccess = function() {
                     callback(true, test);
                   };
