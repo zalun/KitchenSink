@@ -47,10 +47,14 @@ define(function(require) {
         // https://wiki.mozilla.org/WebAPI/ContactsAPI#Get_all_contacts_example
         var test = 'getAll';
         // adding one contact
-        var contact = new mozContact({
+        var data = {
           givenName: ['Tom'], 
           familyName: ['kitchensink-app']
-        }); 
+        }
+        var contact = new mozContact(data); 
+        if (contact.init) {
+          contact.init(data);
+        }
         var saving = navigator.mozContacts.save(contact);
         saving.onsuccess = function() {
             var cursor = navigator.mozContacts.getAll({});
@@ -82,16 +86,24 @@ define(function(require) {
         var test = 'create, search and remove a contact';
 
         this.cleanUp(function() {
-          var contact = new mozContact({
+          var data = {
             givenName: ['Tom'], 
             familyName: ['kitchensink-app']
-          });
+          };
+          var contact = new mozContact(data);
+          if (contact.init) {
+            contact.init(data);
+          }
           var saving1 = navigator.mozContacts.save(contact);
           saving1.onsuccess = function() {
-            var contact = new mozContact({
+            var data = {
               givenName: ['Jerry', 'kitchensink-app'], 
               familyName: ['kitchensink-app']
-            });
+            };
+            var contact = new mozContact(data);
+            if (contact.init) {
+              contact.init(data);
+            }
             var saving2 = navigator.mozContacts.save(contact);
             saving2.onsuccess = function() {
               var search = navigator.mozContacts.find({
