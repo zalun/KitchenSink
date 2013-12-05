@@ -52,7 +52,7 @@ define(function(require) {
           familyName: ['kitchensink-app']
         }
         var contact = new mozContact(data); 
-        if (contact.init) {
+        if ('init' in contact) {
           contact.init(data);
         }
         var saving = navigator.mozContacts.save(contact);
@@ -91,7 +91,7 @@ define(function(require) {
             familyName: ['kitchensink-app']
           };
           var contact = new mozContact(data);
-          if (contact.init) {
+          if ('init' in contact) {
             contact.init(data);
           }
           var saving1 = navigator.mozContacts.save(contact);
@@ -101,7 +101,7 @@ define(function(require) {
               familyName: ['kitchensink-app']
             };
             var contact = new mozContact(data);
-            if (contact.init) {
+            if ('init' in contact) {
               contact.init(data);
             }
             var saving2 = navigator.mozContacts.save(contact);
