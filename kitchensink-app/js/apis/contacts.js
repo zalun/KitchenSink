@@ -83,6 +83,41 @@ define(function(require) {
       },
 
       function(callback) {
+        var test = 'delete already deleted contact';
+        this.cleanUp(function() {
+          var data = {
+            givenName: ['Tom'], 
+            familyName: ['kitchensink-app']
+          };
+          var contact = new mozContact(data);
+          if ('init' in contact) {
+            contact.init(data);
+          }
+          function saveError() {
+            callback(false, test, 'Save error');
+          }
+          function removeError() {
+            callback(false, test, 'Remove error');
+          }
+          var saveRequest = navigator.mozContacts.save(contact);
+          saveRequest.onsuccess = function() {
+            var removeRequest = navigator.mozContacts.remove(contact);
+            removeRequest.onsuccess = function() {
+              var removeRequest2 = navigator.mozContacts.remove(contact);
+              removeRequest2.onsuccess = function() {
+                callback(false, test, 'Successful remove of a non existing contact');
+              };
+              removeRequest2.onerror = function() {
+                callback(true, test);
+              };
+            };
+            removeRequest.onerror = removeError;
+          };
+          saveRequest.onerror = saveError;
+        });
+      },
+        
+      function(callback) {
         var test = 'create, search and remove a contact';
 
         this.cleanUp(function() {
@@ -97,7 +132,10 @@ define(function(require) {
           var saving1 = navigator.mozContacts.save(contact);
           saving1.onsuccess = function() {
             var data = {
-              givenName: ['Jerry', 'kitchensink-app'], 
+              name: ['Jerry', 'kitchensink-app'], 
+              tel: [{value: '123456'}], 
+              email: [{type: ['home'], value: 'test@example.com'},
+                      {type: ['work'], value: 'work@example.com', pref: true}],
               familyName: ['kitchensink-app']
             };
             var contact = new mozContact(data);
@@ -106,15 +144,27 @@ define(function(require) {
             }
             var saving2 = navigator.mozContacts.save(contact);
             saving2.onsuccess = function() {
+              var savedId = contact.id;
               var search = navigator.mozContacts.find({
-                filterBy: ['givenName'],
-                filterValue: 'kitchensink',
+                filterBy: ['name'],
+                filterValue: 'kitch',
                 filterOp: 'startsWith'});
               search.onsuccess = function() {
                 if (search.result.length != 1) {
                   callback(false, test, 'find test failed. Expected: 1, Found: ' + search.result.length);
                 } else {
-                  var removeRequest = navigator.mozContacts.remove(search.result[0]);
+                  var contact = search.result[0];
+                  if (contact.id !== savedId) {
+                    callback(false, test, 'Found contact has wring id');
+                  } else if (!contact.email || contact.email.length !== 2) {
+                    callback(false, test, 'No email found in contact');
+                    return;
+                  }
+                  if (contact.email[0].value != 'test@example.com') {
+                    callback(false, test, 'wrong email saved');
+                    return;
+                  }
+                  var removeRequest = navigator.mozContacts.remove(contact);
                   removeRequest.onsuccess = function() {
                     callback(true, test);
                   };
