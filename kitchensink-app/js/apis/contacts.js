@@ -83,6 +83,55 @@ define(function(require) {
       },
 
       function(callback) {
+        var test = 'update an existing contact by constructing from scratch';
+        this.cleanUp(function() {
+          var data = {
+            givenName: ['Tom'], 
+            familyName: ['kitchensink-app']
+          };
+          var contact = new mozContact(data);
+          if ('init' in contact) {
+            contact.init(data);
+          }
+          function saveError() {
+            callback(false, test, 'Save error');
+          }
+          var saveRequest = navigator.mozContacts.save(contact);
+          saveRequest.onsuccess = function() {
+            var search = navigator.mozContacts.find({
+              filterBy: ['id'],
+              filterValue: contact.id,
+              filterOp: 'equals'});
+            search.onsuccess = function() {
+              if (search.result.length !== 1) {
+                callback(false, test, 'Result number is wrong. 1 !== ' + search.result.length);
+              }
+              var contact2 = search.result[0];
+              contact2.givenName = ['Updated'];
+              var saveRequest2 = navigator.mozContacts.save(contact2);
+              saveRequest2.onsuccess = function() {
+                if (contact2.id !== contact.id) {
+                  callback(false, test, contact2.id + ' !== ' + contact.id);
+                  return;
+                }
+                if (contact2.givenName[0] === 'Updated' &&
+                    contact.familyName === contact.familyName) {
+                  callback(true, test);
+                } else { 
+                  callback(false, test, 'Names are different');
+                }
+              };
+              saveRequest2.onerror = saveError;
+            }
+            search.onerror = function(e) {
+              callback(false, test, 'search error');
+            }
+          };
+          saveRequest.onerror = saveError;
+        });
+      },
+
+      function(callback) {
         var test = 'delete already deleted contact';
         this.cleanUp(function() {
           var data = {
@@ -132,7 +181,8 @@ define(function(require) {
           var saving1 = navigator.mozContacts.save(contact);
           saving1.onsuccess = function() {
             var data = {
-              name: ['Jerry', 'kitchensink-app'], 
+              givenName: ['Jerry', 'kitchensink-app'],
+              familyName: ['kitchensink-app'], 
               tel: [{value: '123456'}], 
               email: [{type: ['home'], value: 'test@example.com'},
                       {type: ['work'], value: 'work@example.com', pref: true}],
@@ -146,8 +196,8 @@ define(function(require) {
             saving2.onsuccess = function() {
               var savedId = contact.id;
               var search = navigator.mozContacts.find({
-                filterBy: ['name'],
-                filterValue: 'kitch',
+                filterBy: ['givenName'],
+                filterValue: 'kitchensink',
                 filterOp: 'startsWith'});
               search.onsuccess = function() {
                 if (search.result.length != 1) {
