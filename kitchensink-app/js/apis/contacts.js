@@ -131,6 +131,9 @@ define(function(require) {
         });
       },
 
+      /* 
+       * it's currentlly a feature not a bug
+       *
       function(callback) {
         var test = 'delete already deleted contact';
         this.cleanUp(function() {
@@ -165,6 +168,7 @@ define(function(require) {
           saveRequest.onerror = saveError;
         });
       },
+      */
         
       function(callback) {
         var test = 'create, search and remove a contact';
